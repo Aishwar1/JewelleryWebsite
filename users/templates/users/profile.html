@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="row">
+
+        <!-- Profile Info Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">My Profile</h2>
+
+                    <p><strong>First Name:</strong> {{ request.user.first_name }}</p>
+                    <p><strong>Last Name:</strong> {{ request.user.last_name }}</p>
+                    <p><strong>Email:</strong> {{ request.user.email }}</p>
+                    <p><strong>Phone:</strong>
+                        <span id="phone-display">{{ profile.default_phone_number }}</span>
+                    </p>
+
+                    <hr>
+
+                    <h5>Default Delivery Address</h5>
+
+                    {% if profile.default_street_address1 %}
+                    <p class="mb-1">{{ profile.default_street_address1 }}</p>
+
+                    {% if profile.default_street_address2 %}
+                    <p class="mb-1">{{ profile.default_street_address2 }}</p>
+                    {% endif %}
+
+                    <p class="mb-1">{{ profile.default_town_or_city }}</p>
+                    <p class="mb-1">{{ profile.default_county }}</p>
+                    <p class="mb-1">{{ profile.default_postcode }}</p>
+                    <p class="mb-0">{{ profile.default_country }}</p>
+
+                    {% else %}
+                    <p class="text-muted">
+                        No delivery address saved yet.
+                    </p>
+                    {% endif %}
+
+                    <hr>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                            Update Contact Info
+                        </button>
+
+                        <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#editAddressModal">
+                            Edit Delivery Address
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase History Card -->
+        <div class="col-md-8">
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Purchase History</h3>
+
+                    {% for order in orders %}
+
+                    <div class="card mb-4 p-3">
+
+                        <h5>Order #{{ order.id }}</h5>
+                        <small>{{ order.created_at|date:"d M Y" }}</small>
+
+                        <hr>
+
+                        {% for item in order.items.all %}
+                        <div class="d-flex justify-content-between">
+                            <span>{{ item.product.name }} x{{ item.quantity }}</span>
+                            <span>€{{ item.get_total }}</span>
+                        </div>
+                        {% endfor %}
+
+                        <hr>
+
+                        <div class="text-end">
+                            <strong>Total: €{{ order.total }}</strong>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Wishlist Card -->
+        <div class="card shadow-sm rounded-4 border-0 mt-4">
+            <div class="card-body">
+                <h3 class="card-title mb-4">Wishlist</h3>
+
+                {% if wishlist %}
+                <div class="row g-3">
+                    {% for item in wishlist %}
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-3 h-100">
+
+                            <h6 class="mb-2">{{ item.product.name }}</h6>
+
+                            <p class="mb-2 text-muted">
+                                €{{ item.product.price }}
+                            </p>
+
+                            <a href="{% url 'shop:product_detail' item.product.id %}"
+                                class="btn btn-sm btn-outline-dark w-100">
+                                View Product
+                            </a>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% else %}
+                <p class="text-muted mb-0">
+                    No items in wishlist yet.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Contact Info -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Contact Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <label for="phone-input" class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" id="phone-input" value="{{ profile.default_phone_number }}">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="button" class="btn btn-dark" id="save-profile-btn">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Delivery Address -->
+    <div class="modal fade" id="editAddressModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content rounded-4">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Delivery Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control" id="address1-input"
+                            value="{{ profile.default_street_address1 }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" id="address2-input"
+                            value="{{ profile.default_street_address2 }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" id="city-input"
+                            value="{{ profile.default_town_or_city }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">County</label>
+                        <input type="text" class="form-control" id="county-input" value="{{ profile.default_county }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Postcode</label>
+                        <input type="text" class="form-control" id="postcode-input"
+                            value="{{ profile.default_postcode }}">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button id="save-address-btn" class="btn btn-dark">
+                        Save Changes
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const updateProfileUrl = "{% url 'users:update_profile' %}";
+    const updatePhoneUrl = "{% url 'users:update_phone' %}";
+</script>
+
+<script src="{% static 'js/profile.js' %}"></script>
+
+
+{% endblock %}
