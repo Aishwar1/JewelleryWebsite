@@ -5,7 +5,7 @@ from .forms import CustomUserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile
-from orders.models import Order
+from Code.orders.models import Order
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 import json

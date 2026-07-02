@@ -1,5 +1,5 @@
 from django.contrib.sitemaps.views import sitemap
-from shop.sitemaps import ProductSitemap
+from Code.shop.sitemaps import ProductSitemap
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings

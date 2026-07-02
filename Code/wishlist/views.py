@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Wishlist
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
-from shop.models import Product
+from Code.shop.models import Product
 from django.http import JsonResponse
 import json
 

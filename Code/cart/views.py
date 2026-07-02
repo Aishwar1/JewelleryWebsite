@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from shop.models import Product
+from Code.shop.models import Product
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from orders.models import Order, OrderItem
+from Code.orders.models import Order, OrderItem
 import stripe
 from django.conf import settings
 
